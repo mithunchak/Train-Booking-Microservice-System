@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booking Successful</title>
+</head>
+<body>
+    <h1>Booking Confirmed ✅</h1>
+    <p>Your PNR Number is: <strong>{{ pnr }}</strong></p>
+
+    <!-- Add Check Status button -->
+    <form action="http://host.docker.internal:5003/submit" method="post" target="_blank">
+        <input type="hidden" name="pnr" value="{{ pnr }}">
+        <button type="submit">Check PNR Status</button>
+    </form>
+</body>
+</html>

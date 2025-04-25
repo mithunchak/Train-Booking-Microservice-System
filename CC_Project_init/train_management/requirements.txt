@@ -1,0 +1,4 @@
+Flask-Cors==4.0.0
+flask
+requests
+mysql-connector-python

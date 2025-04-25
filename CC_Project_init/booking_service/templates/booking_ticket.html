@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Train Ticket Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Book Your Train Ticket</h2>
+        <form action="/book" method="POST">
+            <label>Train Number: <input type="text" name="train_number" required></label>
+            <label>Train Name: <input type="text" name="train_name" required></label>
+            <label>From: <input type="text" name="from_station" required></label>
+            <label>To: <input type="text" name="to_station" required></label>
+            <label>Journey Date: <input type="date" name="journey_date" required></label>
+            <label>Quota: <input type="text" name="quota" value="GENERAL (GN)" required></label>
+            <label>Boarding Point: <input type="text" name="boarding_point" required></label>
+            <label>Class: <input type="text" name="class" value="SL" required></label>
+            <label>Booking Amount: ₹<input type="number" name="amount" required></label>
+            <hr>
+            <h3>Passenger Details</h3>
+            <label>Name: <input type="text" name="name" required></label>
+            <label>Age: <input type="number" name="age" required></label>
+            <label>Gender:
+                <select name="gender" required>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                    <option value="O">Other</option>
+                </select>
+            </label>
+            <input type="submit" value="Confirm Booking">
+        </form>
+    </div>
+</body>
+</html>

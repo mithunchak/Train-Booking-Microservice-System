@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Train Ticket</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f4fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #3f79c8;
+            margin-bottom: 20px;
+        }
+        .train-info {
+            background-color: #eaf1ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .train-info strong {
+            display: inline-block;
+            width: 140px;
+            color: #333;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        form input, form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .btn {
+            background-color: #3f79c8;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #2c5c99;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Passenger Details</h1>
+
+        <!-- Display Selected Train Info -->
+        <div class="train-info">
+            <p><strong>Train Name:</strong> {{ train_name }}</p>
+            <p><strong>Train Number:</strong> {{ train_number }}</p>
+            <p><strong>From:</strong> {{ from_station }}</p>
+            <p><strong>To:</strong> {{ to_station }}</p>
+            <p><strong>Date of Journey:</strong> {{ date }}</p>
+            <p><strong>Seat Number:</strong> {{ seat_number }}</p>
+            <p><strong>Class:</strong> {{ seat_class }}</p>
+        </div>
+
+        <!-- Passenger Form -->
+        <form action="/submit_booking" method="POST">
+            <input type="hidden" name="train_name" value="{{ train_name }}">
+            <input type="hidden" name="train_number" value="{{ train_number }}">
+            <input type="hidden" name="from_station" value="{{ from_station }}">
+            <input type="hidden" name="to_station" value="{{ to_station }}">
+            <input type="hidden" name="date" value="{{ date }}">
+            <input type="hidden" name="seat_number" value="{{ seat_number }}">
+            <input type="hidden" name="seat_class" value="{{ seat_class }}">
+
+            <label for="name">Passenger Name</label>
+            <input type="text" name="passenger_name" id="name" required>
+
+            <label for="age">Age</label>
+            <input type="number" name="age" id="age" required>
+
+            <label for="gender">Gender</label>
+            <select name="gender" id="gender" required>
+                <option value="" disabled selected>Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+			
+            <input type="hidden" name="booking_status" value="Confirmed">
+            <input type="hidden" name="current_status" value="Confirmed">
+
+            <button type="submit" class="btn">Book Ticket</button>
+        </form>
+    </div>
+</body>
+</html>

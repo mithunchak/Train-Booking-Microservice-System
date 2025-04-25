@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booking Confirmation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Booking Confirmed!</h2>
+        <p><strong>PNR Number:</strong> {{ pnr }}</p>
+        <p><strong>Transaction ID:</strong> {{ txn_id }}</p>
+        <p><strong>Passenger:</strong> {{ name }}</p>
+        <a href="/">Book Another Ticket</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Train Ticket</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f8ff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      background-color: white;
+      padding: 30px 40px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      border-radius: 12px;
+    }
+
+    h1 {
+      color: #1e7f8a;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .train-info {
+      margin-bottom: 25px;
+      border-left: 4px solid #1e7f8a;
+      padding: 10px 15px;
+      background-color: #f0f7ff;
+      border-radius: 8px;
+    }
+    
+    .train-info h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #1e7f8a;
+    }
+    
+    .journey-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .journey-details span {
+      font-weight: bold;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #1e3a8a;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    
+    .passenger-container {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+    
+    .passenger-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .passenger-header h3 {
+      margin: 0;
+      color: #1e3a8a;
+    }
+    
+    .passenger-form {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .add-passenger-btn {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 20px;
+    }
+    
+    .add-passenger-btn:hover {
+      background-color: #219652;
+    }
+    
+    .remove-passenger-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      font-size: 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .remove-passenger-btn:hover {
+      background-color: #c0392b;
+    }
+    
+    .submit-btn {
+      background-color: #1e3a8a;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      margin-top: 20px;
+    }
+    
+    .submit-btn:hover {
+      background-color: #274baf;
+    }
+    
+    .status-message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .ticket-details {
+      margin-top: 30px;
+      border: 2px solid #1e7f8a;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #f0f7ff;
+    }
+    
+    .ticket-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .ticket-info {
+      margin-bottom: 10px;
+    }
+    
+    .ticket-info span {
+      font-weight: bold;
+    }
+
+    /* Added styles for journey date */
+    .journey-date {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #fffdeb;
+      border-radius: 5px;
+      border: 1px solid #e6dfba;
+    }
+
+    /* PNR Check Section Styles */
+    .pnr-check-section {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #f0fffd;
+      border-radius: 8px;
+      border: 1px solid #c0e8e4;
+    }
+
+    .pnr-check-section h3 {
+      color: #1e7f8a;
+      margin-top: 0;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .pnr-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    .pnr-input {
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #1e7f8a;
+      border-radius: 8px;
+    }
+
+    .pnr-btn {
+      background-color: #1e7f8a;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .pnr-btn:hover {
+      background-color: #166974;
+    }
+
+    .pnr-result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      display: none;
+    }
+
+    /* Tabs for switching between booking and PNR check */
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background-color: #f0f7ff;
+      border: 1px solid #ddd;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+
+    .tab.active {
+      background-color: white;
+      border-bottom: 2px solid white;
+      font-weight: bold;
+      color: #1e7f8a;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Railway Services</h1>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="booking">Book Ticket</div>
+      <div class="tab" data-tab="pnr-check">Check PNR Status</div>
+    </div>
+    
+    <div id="booking-tab" class="tab-content active">
+      <div class="train-info">
+        <h2>{{ train.name if train.name else 'Train' }} ({{ train.number if train.number else 'Unknown' }})</h2>
+        <div class="journey-details">
+          <div><span>From:</span> {{ train.from if train.from else 'Unknown' }}</div>
+          <div><span>To:</span> {{ train.to if train.to else 'Unknown' }}</div>
+        </div>
+        <div class="journey-details">
+          <div><span>Class:</span> {{ train.class if train.class else 'Unknown' }}</div>
+          <div><span>Quota:</span> {{ train.quota if train.quota else 'General' }}</div>
+        </div>
+        <div class="journey-details">
+          <div><span>Boarding Point:</span> {{ train.boarding_point if train.boarding_point else train.from }}</div>
+          <div><span>Available Seats:</span> {{ train.seat if train.seat else 'Unknown' }}</div>
+        </div>
+        <div class="journey-date">
+          <span>Journey Date:</span> {{ train.journey_date if train.journey_date else 'Today' }} 
+          <small>(Default: Today)</small>
+        </div>
+      </div>
+      
+      <div id="bookingForm">
+        <div id="passengersContainer">
+          <div class="passenger-container" id="passenger-1">
+            <div class="passenger-header">
+              <h3>Passenger 1</h3>
+            </div>
+            <div class="passenger-form">
+              <div class="form-group">
+                <label for="name-1">Name</label>
+                <input type="text" id="name-1" class="form-control passenger-name" required>
+              </div>
+              <div class="form-group">
+                <label for="age-1">Age</label>
+                <input type="number" id="age-1" class="form-control passenger-age" min="1" max="120" required>
+              </div>
+              <div class="form-group">
+                <label for="gender-1">Gender</label>
+                <select id="gender-1" class="form-control passenger-gender" required>
+                  <option value="">Select</option>
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                  <option value="O">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <button type="button" class="add-passenger-btn" id="addPassengerBtn">+ Add Passenger</button>
+        
+        <button type="button" class="submit-btn" id="bookTicketBtn">Book Ticket</button>
+      </div>
+      
+      <div id="statusMessage" class="status-message" style="display: none;"></div>
+      
+      <div id="ticketDetails" class="ticket-details" style="display: none;">
+        <div class="ticket-header">
+          <h2>Booking Confirmed!</h2>
+        </div>
+        <div class="ticket-info"><span>PNR:</span> <span id="pnrNumber"></span></div>
+        <div class="ticket-info"><span>Transaction ID:</span> <span id="txnId"></span></div>
+        <div class="ticket-info"><span>Train:</span> <span id="trainDetails"></span></div>
+        <div class="ticket-info"><span>Journey:</span> <span id="journeyDetails"></span></div>
+        <div class="ticket-info"><span>Class:</span> <span id="classDetails"></span></div>
+        <div class="ticket-info"><span>Quota:</span> <span id="quotaDetails"></span></div>
+        <div class="ticket-info"><span>Booking Date:</span> <span id="bookingDate"></span></div>
+        <div class="ticket-info"><span>Seat Information:</span> <span id="seatInfo"></span></div>
+      </div>
+    </div>
+    
+    <div id="pnr-check-tab" class="tab-content">
+      <div class="pnr-check-section">
+        <h3>Check PNR Status</h3>
+        <form id="pnrForm" action="/check-pnr" method="POST">
+          <div class="pnr-form">
+            <input type="text" name="pnr" id="pnr-input" class="pnr-input" placeholder="Enter PNR Number" required>
+            <button type="submit" class="pnr-btn">Check Status</button>
+          </div>
+        </form>
+        
+        <!-- For AJAX version (optional) -->
+        <div id="pnrResult" class="pnr-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let passengerCount = 1;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add Passenger Button Event
+      document.getElementById('addPassengerBtn').addEventListener('click', addPassenger);
+      
+      // Book Ticket Button Event
+      document.getElementById('bookTicketBtn').addEventListener('click', bookTicket);
+      
+      // Tab Switching
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Remove active class from all tabs
+          tabs.forEach(t => t.classList.remove('active'));
+          
+          // Add active class to clicked tab
+          this.classList.add('active');
+          
+          // Hide all content
+          document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+          });
+          
+          // Show corresponding content
+          const tabId = this.getAttribute('data-tab');
+          document.getElementById(tabId + '-tab').classList.add('active');
+        });
+      });
+      
+      // Optional: AJAX PNR Check
+      /* 
+      document.getElementById('pnrCheckBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        checkPNRStatus();
+      });
+      */
+    });
+    
+    function addPassenger() {
+      if (passengerCount >= 6) {
+        alert('Maximum 6 passengers allowed per booking.');
+        return;
+      }
+      
+      passengerCount++;
+      const newPassenger = document.createElement('div');
+      newPassenger.className = 'passenger-container';
+      newPassenger.id = `passenger-${passengerCount}`;
+      
+      newPassenger.innerHTML = `
+        <div class="passenger-header">
+          <h3>Passenger ${passengerCount}</h3>
+          <button type="button" class="remove-passenger-btn" onclick="removePassenger(${passengerCount})">Remove</button>
+        </div>
+        <div class="passenger-form">
+          <div class="form-group">
+            <label for="name-${passengerCount}">Name</label>
+            <input type="text" id="name-${passengerCount}" class="form-control passenger-name" required>
+          </div>
+          <div class="form-group">
+            <label for="age-${passengerCount}">Age</label>
+            <input type="number" id="age-${passengerCount}" class="form-control passenger-age" min="1" max="120" required>
+          </div>
+          <div class="form-group">
+            <label for="gender-${passengerCount}">Gender</label>
+            <select id="gender-${passengerCount}" class="form-control passenger-gender" required>
+              <option value="">Select</option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+              <option value="O">Other</option>
+            </select>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('passengersContainer').appendChild(newPassenger);
+    }
+    
+    function removePassenger(id) {
+      document.getElementById(`passenger-${id}`).remove();
+    }
+    
+    // Optional: AJAX version of PNR check
+    /*
+    function checkPNRStatus() {
+      const pnrNumber = document.getElementById('pnr-input').value;
+      if (!pnrNumber) {
+        alert('Please enter a PNR number');
+        return;
+      }
+      
+      document.getElementById('pnrResult').style.display = 'block';
+      document.getElementById('pnrResult').textContent = 'Loading PNR status...';
+      
+      fetch(`/api/check_pnr/${pnrNumber}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('pnrResult').textContent = data.error;
+          } else {
+            // Format and display PNR info
+            let resultHTML = `<h4>PNR: ${data.pnr}</h4>`;
+            resultHTML += `<p><strong>Train:</strong> ${data.train_name}</p>`;
+            resultHTML += `<p><strong>Journey:</strong> ${data.from_station} to ${data.to_station}</p>`;
+            resultHTML += `<p><strong>Date of Journey:</strong> ${data.doj}</p>`;
+            resultHTML += `<p><strong>Class:</strong> ${data.class_type} | <strong>Quota:</strong> ${data.quota}</p>`;
+            
+            if (data.passengers && data.passengers.length > 0) {
+              resultHTML += '<h4>Passengers:</h4>';
+              resultHTML += '<ul>';
+              data.passengers.forEach(passenger => {
+                resultHTML += `<li>${passenger.name} (${passenger.age}/${passenger.gender}) - Status: ${passenger.current_status}</li>`;
+              });
+              resultHTML += '</ul>';
+            }
+            
+            document.getElementById('pnrResult').innerHTML = resultHTML;
+          }
+        })
+        .catch(error => {
+          document.getElementById('pnrResult').textContent = 'Error checking PNR status. Please try again.';
+        });
+    }
+    */
+    
+    function bookTicket() {
+      // Get train details from the page
+      const trainNumber = "{{ train.number }}";
+      const trainName = "{{ train.name }}";
+      const fromStation = "{{ train.from }}";
+      const toStation = "{{ train.to }}";
+      const trainClass = "{{ train.class }}";
+      const quota = "{{ train.quota if train.quota else 'General' }}";
+      const boardingPoint = "{{ train.boarding_point if train.boarding_point else train.from }}";
+      const seatInfo = "{{ train.seat }}";
+      
+      // Collect passenger data
+      const passengers = [];
+      const passengerContainers = document.querySelectorAll('.passenger-container');
+      
+      // Validate inputs
+      let isValid = true;
+      
+      passengerContainers.forEach(container => {
+        const id = container.id.split('-')[1];
+        const nameInput = document.getElementById(`name-${id}`);
+        const ageInput = document.getElementById(`age-${id}`);
+        const genderInput = document.getElementById(`gender-${id}`);
+        
+        if (!nameInput.value) {
+          nameInput.style.borderColor = 'red';
+          isValid = false;
+        } else {
+          nameInput.style.borderColor = '#1e3a8a';
+        }
+        
+        if (!ageInput.value) {
+          ageInput.style.borderColor = 'red';
+          isValid = false;
+        } else {
+          ageInput.style.borderColor = '#1e3a8a';
+        }
+        
+        if (!genderInput.value) {
+          genderInput.style.borderColor = 'red';
+          isValid = false;
+        } else {
+          genderInput.style.borderColor = '#1e3a8a';
+        }
+        
+        if (nameInput.value && ageInput.value && genderInput.value) {
+          passengers.push({
+            name: nameInput.value,
+            age: parseInt(ageInput.value),
+            gender: genderInput.value,
+            seat: seatInfo // Pass seat info for each passenger
+          });
+        }
+      });
+      
+      if (!isValid) {
+        showStatus('Please fill in all required fields.', 'error');
+        return;
+      }
+      
+      if (passengers.length === 0) {
+        showStatus('Please add at least one passenger.', 'error');
+        return;
+      }
+      
+      // Prepare booking data
+      const bookingData = {
+        train: {
+          number: trainNumber,
+          name: trainName,
+          from: fromStation,
+          to: toStation,
+          class: trainClass,
+          quota: quota,
+          boarding_point: boardingPoint || fromStation
+        },
+        passengers: passengers
+      };
+      
+      // Show loading message
+      showStatus('Processing your booking...', '');
+      
+      // Send booking request
+      fetch('/book', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bookingData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          showStatus('Booking successful!', 'success');
+          
+          // Display ticket details
+          document.getElementById('pnrNumber').textContent = data.pnr;
+          document.getElementById('txnId').textContent = data.transaction_id;
+          document.getElementById('trainDetails').textContent = `${trainName} (${trainNumber})`;
+          document.getElementById('journeyDetails').textContent = `${fromStation} to ${toStation}`;
+          document.getElementById('classDetails').textContent = trainClass;
+          document.getElementById('quotaDetails').textContent = quota;
+          document.getElementById('bookingDate').textContent = new Date().toLocaleDateString();
+          document.getElementById('seatInfo').textContent = data.seat_info;
+          
+          document.getElementById('ticketDetails').style.display = 'block';
+          document.getElementById('bookingForm').style.display = 'none';
+          
+          // Auto-fill the PNR check form with the newly created PNR
+          document.getElementById('pnr-input').value = data.pnr;
+        } else {
+          showStatus(`Booking failed: ${data.message}`, 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showStatus('Something went wrong. Please try again later.', 'error');
+      });
+    }
+    
+    function showStatus(message, type) {
+      const statusElement = document.getElementById('statusMessage');
+      statusElement.textContent = message;
+      statusElement.className = 'status-message';
+      
+      if (type) {
+        statusElement.classList.add(type);
+      }
+      
+      statusElement.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

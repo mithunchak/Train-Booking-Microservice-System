@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  # Database services
+  train-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 101010
+      MYSQL_DATABASE: train_db
+    volumes:
+      - train-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root","-p101010"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  seat-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 101010
+      MYSQL_DATABASE: train_seat_availability
+    volumes:
+      - seat-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  booking-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 101010
+      MYSQL_DATABASE: booking_services
+    volumes:
+      - booking-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pnr-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 101010
+      MYSQL_DATABASE: pnr_db
+    volumes:
+      - pnr-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Application services
+  train-management:
+    build:
+      context: ./train_management
+      dockerfile: Dockerfile
+    container_name: train-management
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=train-db
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=train_db
+      - SEAT_AVAILABILITY_URL=http://seat-availability:5001
+    depends_on:
+      train-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  seat-availability:
+    build:
+      context: ./train_seat_availability
+      dockerfile: Dockerfile
+    container_name: seat-availability
+    ports:
+      - "5001:5001"
+    environment:
+      - DB_HOST=seat-db
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=seat_db
+      - BOOKING_SERVICE_URL=http://booking-service:5002
+      - SERVICE_API_KEY=seat-service-key
+    depends_on:
+      seat-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  booking-service:
+    build:
+      context: ./booking_service
+      dockerfile: Dockerfile
+    container_name: booking-service
+    ports:
+      - "5002:5002"
+    environment:
+      - DB_HOST=booking-db
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=booking_db
+      - SEAT_SERVICE_URL=http://seat-availability:5001
+      - PNR_SERVICE_URL=http://pnr-service:5003
+      - SERVICE_API_KEY=booking-service-key
+    depends_on:
+      booking-db:
+        condition: service_healthy
+      seat-availability:
+        condition: service_started
+    restart: unless-stopped
+
+  pnr-service:
+    build:
+      context: ./PNR_Status_Checking
+      dockerfile: Dockerfile
+    container_name: pnr-service
+    ports:
+      - "5003:5003"
+    environment:
+      - DB_HOST=pnr-db
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - DB_NAME=pnr_db
+    depends_on:
+      pnr-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  train-db-data:
+  seat-db-data:
+  booking-db-data:
+  pnr-db-data:

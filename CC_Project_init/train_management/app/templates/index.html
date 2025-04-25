@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Train Schedule</title>
+  <style>
+    :root {
+      --primary-color: #0066cc;
+      --primary-light: #e8f2ff;
+      --secondary-color: #ec5b24;
+      --text-dark: #333333;
+      --text-light: #666666;
+      --border-color: #e6e6e6;
+      --success-color: #00a651;
+      --warning-color: #f39c12;
+      --background: #f8f9fa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--background);
+      color: var(--text-dark);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: var(--primary-color);
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 10px;
+      font-weight: 600;
+      font-size: 28px;
+    }
+
+    /* Search Form */
+    .search-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 25px;
+      margin: 25px auto;
+      max-width: 800px;
+    }
+
+    .form-title {
+      font-size: 18px;
+      color: var(--text-dark);
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 16px;
+      color: var(--text-dark);
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-color: white;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+      outline: none;
+    }
+
+    .search-btn {
+      display: block;
+      width: 100%;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 10px;
+    }
+
+    .search-btn:hover {
+      background-color: #0055aa;
+    }
+
+    /* Results Table */
+    .results-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin: 25px auto;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    thead {
+      background-color: var(--primary-light);
+    }
+
+    th {
+      color: var(--primary-color);
+      font-weight: 600;
+      text-align: left;
+      padding: 16px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-dark);
+      font-size: 14px;
+    }
+
+    tbody tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    .train-number {
+      font-weight: 600;
+    }
+
+    .train-name {
+      color: var(--text-light);
+    }
+
+    .countdown {
+      font-weight: 600;
+      color: var(--secondary-color);
+    }
+
+    .departure-time {
+      font-weight: 600;
+    }
+
+    /* Seat Check Button */
+    .seat-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.3s;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .seat-btn:hover {
+      background-color: #1e7f8a;
+    }
+
+    /* Modal styles */
+    #seatModal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+      transition: opacity 0.3s;
+    }
+    
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 550px;
+      position: relative;
+      animation: modalSlideIn 0.3s;
+    }
+    
+    @keyframes modalSlideIn {
+      from {transform: translateY(-50px); opacity: 0;}
+      to {transform: translateY(0); opacity: 1;}
+    }
+    
+    .close-modal {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      color: var(--text-light);
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    
+    .close-modal:hover {
+      color: var(--text-dark);
+    }
+    
+    #modalTrainTitle {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 5px;
+    }
+    
+    #modalRouteInfo {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .seat-class {
+      margin: 15px 0;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .seat-class h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: var(--text-dark);
+    }
+    
+    .seat-class p {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .seat-class .available {
+      color: var(--success-color);
+      font-weight: 600;
+    }
+    
+    .seat-class .waiting {
+      color: var(--warning-color);
+      font-weight: 600;
+    }
+    
+    .seat-class .no-seats {
+      color: #e74c3c;
+      font-weight: 600;
+    }
+    
+    .book-now {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .book-now:hover {
+      background-color: #d64a13;
+    }
+    
+    .loading-spinner {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-light);
+    }
+
+    .error {
+      color: #e74c3c;
+      padding: 15px;
+      text-align: center;
+      background-color: #fde8e6;
+      border-radius: 6px;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .modal-content {
+        width: 95%;
+        margin: 10% auto;
+      }
+      
+      td, th {
+        padding: 12px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Train Search</h1>
+  </header>
+
+  <div class="container">
+    <div class="search-container">
+      <h2 class="form-title">Find Your Train</h2>
+      <form method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="source">From</label>
+            <select name="source" id="source" required>
+              <option value="">Select Source</option>
+              {% for source in places_dict.keys() %}
+                <option value="{{ source }}">{{ source }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="destination">To</label>
+            <select name="destination" id="destination" required>
+              <option value="">Select Destination</option>
+            </select>
+          </div>
+        </div>
+        
+        <button type="submit" class="search-btn">SEARCH TRAINS</button>
+      </form>
+    </div>
+
+    {% if results %}
+    <div class="results-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Train Number</th>
+            <th>Train Name</th>
+            <th>Station</th>
+            <th>Departure</th>
+            <th>Time Left</th>
+            <th>Source</th>
+            <th>Destination</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for result in results %}
+            <tr>
+              <td class="train-number">{{ result.train_number }}</td>
+              <td class="train-name">{{ result.train_name }}</td>
+              <td>{{ result.station_name }}</td>
+              <td class="departure-time">{{ result.departure }}</td>
+              <td class="countdown">Calculating...</td>
+              <td>{{ result.source }}</td>
+              <td>{{ result.destination }}</td>
+              <td>
+                <button class="seat-btn"
+                        data-train-number="{{ result.train_number }}"
+                        data-train-name="{{ result.train_name }}"
+                        data-station="{{ result.station_name }}"
+                        data-departure="{{ result.departure }}"
+                        data-source="{{ result.source }}"
+                        data-destination="{{ result.destination }}"
+                        onclick="checkSeatAvailability(this)">
+                  Check Seats
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Seat Modal -->
+  <div id="seatModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <h2 id="modalTrainTitle"></h2>
+      <p id="modalRouteInfo"></p>
+      <div id="modalContent">
+        <div class="loading-spinner">Loading seat information...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load destinations dynamically
+    const places = {{ places_dict | tojson }};
+    const sourceSelect = document.getElementById("source");
+    const destinationSelect = document.getElementById("destination");
+
+    sourceSelect.addEventListener("change", () => {
+      const selectedSource = sourceSelect.value;
+      destinationSelect.innerHTML = '<option value="">Select Destination</option>';
+      if (places[selectedSource]) {
+        places[selectedSource].forEach(dest => {
+          const option = document.createElement("option");
+          option.value = dest;
+          option.textContent = dest;
+          destinationSelect.appendChild(option);
+        });
+      }
+    });
+
+    // Modal functionality
+    const modal = document.getElementById("seatModal");
+    
+    function closeModal() {
+      modal.style.display = "none";
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+
+    // Check seat availability via API
+    function checkSeatAvailability(button) {
+      const trainData = {
+        train_number: button.dataset.trainNumber,
+        train_name: button.dataset.trainName,
+        source: button.dataset.source,
+        destination: button.dataset.destination
+      };
+      
+      // Show modal
+      document.getElementById("modalTrainTitle").textContent = 
+        `${trainData.train_name} (${trainData.train_number})`;
+      document.getElementById("modalRouteInfo").textContent = 
+        `From ${trainData.source} to ${trainData.destination}`;
+      document.getElementById("modalContent").innerHTML = 
+        '<div class="loading-spinner">Loading seat information...</div>';
+      modal.style.display = "block";
+      
+      // Make API request to our own backend which will proxy to seat service
+      fetch('/api/check_seat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(trainData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Seat availability data:", data);
+        
+        let contentHtml = '';
+        
+        if (data.error) {
+          contentHtml = `<div class="error">${data.error}</div>`;
+        } else if (data.seat_info) {
+          Object.entries(data.seat_info).forEach(([classType, availability]) => {
+            let availabilityClass = '';
+            if (availability.includes("No Seats Available")) {
+              availabilityClass = 'no-seats';
+            } else if (availability.includes("Waiting List")) {
+              availabilityClass = 'waiting';
+            } else {
+              availabilityClass = 'available';
+            }
+            
+            contentHtml += `
+              <div class="seat-class">
+                <h3>${classType}</h3>
+                <p class="${availabilityClass}">${availability}</p>
+                ${availability.includes("Available") ? 
+                  `<button class="book-now" onclick="redirectToBooking('${trainData.train_number}', '${trainData.train_name}', '${trainData.source}', '${trainData.destination}', '${classType}', '${availability}')">
+                    Book Now
+                  </button>` : 
+                  ''}
+              </div>
+            `;
+          });
+        } else {
+          contentHtml = '<div class="error">No seat information available</div>';
+        }
+        
+        document.getElementById("modalContent").innerHTML = contentHtml;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById("modalContent").innerHTML = 
+          '<div class="error">Error fetching seat information. Please try again.</div>';
+      });
+    }
+    
+    // Redirect to booking service
+    function redirectToBooking(trainNumber, trainName, source, destination, classType, availability) {
+      // Extract available seats from availability string (e.g. "10 Available" -> "10")
+      let seatInfo = "";
+      if (availability.includes("Available")) {
+        seatInfo = availability.split(" ")[0];
+      }
+      
+      // Format the URL with all required parameters
+      const bookingParams = new URLSearchParams({
+        number: trainNumber,
+        name: trainName,
+        from: source,
+        to: destination,
+        class: classType,
+        quota: "General", // Default quota
+        boarding: source, // Default boarding point is same as source
+        seat: seatInfo
+      });
+      
+      // Redirect to booking service
+      window.location.href = `http://127.0.0.1:5002/?${bookingParams.toString()}`;
+    }
+
+    // Countdown Timer
+    function updateCountdowns() {
+      const rows = document.querySelectorAll("tbody tr");
+      const now = new Date();
+
+      rows.forEach(row => {
+        const departureCell = row.querySelector(".departure-time");
+        const countdownCell = row.querySelector(".countdown");
+
+        if (departureCell && countdownCell) {
+          const depTime = departureCell.textContent.trim();
+          const [depHours, depMinutes] = depTime.split(":").map(Number);
+
+          const departure = new Date();
+          departure.setHours(depHours, depMinutes, 0, 0);
+
+          if (departure < now) {
+            departure.setDate(departure.getDate() + 1);
+          }
+
+          const diffMs = departure - now;
+
+          if (diffMs > 0) {
+            const hours = Math.floor(diffMs / (1000 * 60 * 60));
+            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+            countdownCell.textContent = `${hours.toString().padStart(2, '0')}:${minutes
+              .toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} left`;
+          } else {
+            countdownCell.textContent = "Departed";
+          }
+        }
+      });
+    }
+
+    setInterval(updateCountdowns, 1000);
+    updateCountdowns();
+  </script>
+</body>
+</html>

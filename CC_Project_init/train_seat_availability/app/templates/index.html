@@ -1,0 +1,212 @@
+// Store train details
+let currentTrainDetails = {};
+
+// Check if we have parameters in the URL
+window.onload = function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const trainNumber = urlParams.get('train_number');
+  const trainName = urlParams.get('train_name');
+  const source = urlParams.get('source');
+  const destination = urlParams.get('destination');
+  
+  if (trainNumber) {
+    document.getElementById('trainNumberInput').value = trainNumber;
+    
+    // Display train details if provided
+    if (trainName && source && destination) {
+      currentTrainDetails = {
+        number: trainNumber,
+        name: trainName,
+        source: source,
+        destination: destination
+      };
+      
+      displayTrainInfo(currentTrainDetails);
+    }
+    
+    // Auto-check availability
+    checkSeatAvailability();
+  }
+};
+
+function displayTrainInfo(trainDetails) {
+  const infoContainer = document.getElementById('trainInfoContainer');
+  document.getElementById('trainNameNumber').textContent = `${trainDetails.name} (${trainDetails.number})`;
+  document.getElementById('trainSource').textContent = trainDetails.source;
+  document.getElementById('trainDestination').textContent = trainDetails.destination;
+  infoContainer.style.display = 'block';
+}
+
+function checkSeatAvailability() {
+  const trainNumber = document.getElementById("trainNumberInput").value.trim();
+  const resultContainer = document.getElementById("seatResultsContainer");
+  const errorContainer = document.getElementById("errorContainer");
+  const loadingIndicator = document.getElementById("loadingIndicator");
+
+  if (!trainNumber) {
+    errorContainer.innerHTML = "Please enter a train number";
+    return;
+  }
+
+  // Clear previous results and error message
+  resultContainer.innerHTML = "";
+  errorContainer.innerHTML = "";
+  
+  // Show loading indicator
+  loadingIndicator.style.display = "block";
+
+  // Log the API request for transparency
+  console.log("[SEAT SERVICE FRONTEND] Making API request for train:", trainNumber);
+
+  // Add request ID for tracing
+  const requestId = generateRequestId();
+  
+  // Make the fetch request to the backend
+  fetch("/check_seat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Request-ID": requestId
+    },
+    body: JSON.stringify({ 
+      train_number: trainNumber,
+      train_name: currentTrainDetails.name || "",
+      source: currentTrainDetails.source || "",
+      destination: currentTrainDetails.destination || ""
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Hide loading indicator
+    loadingIndicator.style.display = "none";
+    console.log("[SEAT SERVICE FRONTEND] Received seat availability data:", data);
+    
+    const { seat_info, message, train_number, train_name, source, destination } = data;
+
+    // Store/update train details from response
+    currentTrainDetails = {
+      number: train_number,
+      name: train_name || currentTrainDetails.name || "Unknown",
+      source: source || currentTrainDetails.source || "Unknown",
+      destination: destination || currentTrainDetails.destination || "Unknown"
+    };
+
+    // Handle error message
+    if (message) {
+      errorContainer.innerHTML = message;
+      return;
+    }
+
+    // Display seat availability information
+    if (seat_info) {
+      const classBox = document.createElement("div");
+      classBox.className = "class-box";
+      
+      // If we don't have train details displayed yet (when entering train number manually)
+      if (document.getElementById('trainInfoContainer').style.display === 'none' && train_name) {
+        // Try to display train info if we have it
+        currentTrainDetails = {
+          number: train_number,
+          name: train_name,
+          source: source || "Unknown",
+          destination: destination || "Unknown"
+        };
+        displayTrainInfo(currentTrainDetails);
+      } else if (document.getElementById('trainInfoContainer').style.display === 'none') {
+        classBox.innerHTML = `
+          <h2>Seat Availability for Train Number: ${train_number}</h2>
+        `;
+      } else {
+        classBox.innerHTML = `
+          <h2>Seat Availability</h2>
+        `;
+      }
+
+      for (let [classType, availability] of Object.entries(seat_info)) {
+        let availabilityClass = '';
+        if (availability.includes("No Seats Available")) {
+          availabilityClass = 'no-seats';
+        } else if (availability.includes("Waiting List")) {
+          availabilityClass = 'waiting';
+        } else {
+          availabilityClass = 'available';
+        }
+
+        // Create booking URL with parameters
+        const bookingUrl = createBookingUrl(currentTrainDetails, classType, availability);
+
+        classBox.innerHTML += `
+          <div class="availability ${availabilityClass}">${classType}: ${availability}</div>
+          ${availability.includes("Available") ? 
+            `<a href="${bookingUrl}" class="book-now-button">Book Now</a>` : 
+            ""}
+        `;
+      }
+
+      resultContainer.appendChild(classBox);
+    } else {
+      errorContainer.innerHTML = "No availability information found for the provided train number.";
+    }
+  })
+  .catch(error => {
+    // Hide loading indicator
+    loadingIndicator.style.display = "none";
+    
+    console.error("Error:", error);
+    errorContainer.innerHTML = "Something went wrong. Please try again later.";
+  });
+}
+
+// Create booking URL with all parameters
+function createBookingUrl(trainDetails, classType, availability) {
+  // Extract available seats from availability string (e.g. "10 Available" -> "10")
+  let seatInfo = "";
+  if (availability.includes("Available")) {
+    seatInfo = availability.split(" ")[0];
+  }
+  
+  // Format the URL with all required parameters
+  const bookingParams = new URLSearchParams({
+    number: trainDetails.number,
+    name: trainDetails.name,
+    from: trainDetails.source,
+    to: trainDetails.destination,
+    class: classType,
+    quota: "General", // Default quota
+    boarding: trainDetails.source, // Default boarding point is same as source
+    seat: seatInfo,
+    request_id: generateRequestId() // Add request ID for tracing
+  });
+  
+  // Return URL pointing to booking service
+  return `http://127.0.0.1:5002/?${bookingParams.toString()}`;
+}
+
+// Generate a request ID for tracing requests across services
+function generateRequestId() {
+  return 'req_' + Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15);
+}
+
+// Function to demonstrate fetching data from the API directly
+function fetchTrainDataFromAPI(trainNumber) {
+  const requestId = generateRequestId();
+  
+  fetch(`/api/train/${trainNumber}`, {
+    headers: {
+      "X-Request-ID": requestId
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log("API data for train:", data);
+    })
+    .catch(error => {
+      console.error("API Error:", error);
+    });
+}
