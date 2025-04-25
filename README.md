@@ -49,10 +49,13 @@ The service also implements a proxy endpoint for seat availability:
 def api_check_seat():
     """Proxy endpoint for seat availability service"""
     # Implementation details
+    
 Frontend:
 ![Screenshot 2025-04-25 204607](https://github.com/user-attachments/assets/6c3559c1-f21e-452c-8556-53e16cbdd13a)
+
 Backend:
 ![Screenshot 2025-04-25 204658](https://github.com/user-attachments/assets/032b3a35-e557-47a6-a788-7545abc9555e)
+
 2.2 Seat Availability Service (Port 5001)
 2.2.1 Core Functionality
 Checks real-time seat availability for specific trains
@@ -83,10 +86,13 @@ api_key = request.headers.get('X-API-Key')
 if api_key not in ['train-search-key', 'booking-service-key', SERVICE_API_KEY]:
     logger.warning(f"Unauthorized API request for train #{train_number}")
     return jsonify({"error": "Unauthorized"}), 401
+    
 Frontend:
 ![Screenshot 2025-04-25 204728](https://github.com/user-attachments/assets/3e700baa-c669-4117-a99a-119337e51d61)
+
 Backend:
 ![Screenshot 2025-04-25 204921](https://github.com/user-attachments/assets/10fef23e-b177-4fbd-a385-68765a5a9a2d)
+
 2.3 Booking Service (Port 5002)
 2.3.1 Core Functionality
 Provides a booking form for train ticket reservations
@@ -125,10 +131,13 @@ pnr_response = requests.post(
     json=pnr_data,
     timeout=5
 )
+
 Frontend:
 ![Screenshot 2025-04-25 205028](https://github.com/user-attachments/assets/b7e71e08-75c7-4a33-b0ca-5aeae0f7efe1)
+
 Backend:
 ![Screenshot 2025-04-25 205115](https://github.com/user-attachments/assets/a70116dc-6184-44a5-b19f-39274534043c)
+
 2.4 PNR Status Service (Port 5003)
 2.4.1 Core Functionality
 Provides PNR status checking capabilities
@@ -167,10 +176,13 @@ for i, passenger in enumerate(data['passengers'], 1):
     """, (
         # Parameter values
     ))
+    
 Frontend:
 ![Screenshot 2025-04-25 205158](https://github.com/user-attachments/assets/d3fee861-b973-4dfc-97eb-6bcec1e0a891)
+
 Backend:
 ![Screenshot 2025-04-25 205251](https://github.com/user-attachments/assets/1c6f9a80-4788-498b-9e71-3855de9a3551)
+
 2.5 Hotel Recommendation Integration
 2.5.1 Core Functionality
 Suggests hotels at the destination city when users search for trains
@@ -238,8 +250,11 @@ Hotel data structure from API response:
     }
   ]
 }
+
 Logs:
+
 ![Screenshot 2025-04-25 205345](https://github.com/user-attachments/assets/7be3fbbc-2991-46d1-8bf9-eab76b326bf8)
+
 3. DevOps Implementation
 3.1 Containerization Strategy
 The system utilizes Docker for containerization with a multi-container setup defined in docker-compose.yml:
@@ -272,8 +287,11 @@ healthcheck:
   interval: 5s
   timeout: 5s
   retries: 10
+  
 Docker containers:
+
 ![Screenshot 2025-04-25 205438](https://github.com/user-attachments/assets/8b1f0854-2be2-441f-b763-5ece8621fd38)
+
 4. Database Design
 4.1 Multiple Database Approach
 Each service maintains its own database:
